@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 
 # Datos del calentador de agua
 masa_agua_kg = 1  # Masa de agua en kg
-capacidad_termica_agua_J_kgC = 4186  # Capacidad térmica del agua en J/kg°C
-potencia_resistencia_W = 1950  # Potencia de la resistencia eléctrica en W
-tiempo_simulacion_s = 150  # Tiempo de simulación en segundos
+capacidad_termica_agua_J_kgC = 4.186  # Capacidad térmica del agua en J/kg°C
+potencia_resistencia_W = 108  # Potencia de la resistencia eléctrica en W
+tiempo_simulacion_s = 8  # Tiempo de simulación en segundos
 temperatura_inicial_C = 10  # Temperatura inicial del agua en °C
 temperatura_objetivo_C = 75  # Temperatura objetivo del agua en °C
 delta_t = 1  # Paso del tiempo en segundos
