@@ -1,21 +1,22 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 class CalentadorH2O:
     def __init__(self):
         self.parametros()
 
     def parametros(self):
-        self.radio = 0.05  # Define el radio del calentador en metros.
-        self.altura = 0.14  # Define la altura del calentador en metros.
+        self.radio = 0.05  # Radio del calentador en metros.
+        self.altura = 0.14  # Altura del calentador en metros.
         self.espesor = [0.01, 0.005, 0.05]  # Define los espesores de las paredes del calentador en metros.
-        self.qent = 108  # Define la cantidad de energía entregada al sistema por unidad de tiempo en vatios.
-        self.qesph2o = 4.186  # Define la cantidad de calor específico del agua en vatios por gramo por grado Celsius.
-        self.tiempo_max = 8  # Define el tiempo máximo de simulación en segundos.
-        self.ti = 10  # Temperatura inicial
-        self.te = 10  # Temperatura externa
-        self.k = 0.02  # Define la conductividad térmica del material en vatios por metro por grado Celsius.
+        self.voltaje_V = 110  # Voltaje suministrado en V
+        self.resistencia_Ohm = 108  # Resistencia eléctrica en Ohm
+        self.qesph2o = 4186  # Capacidad térmica del agua en J/kg°C
+        self.tiempo_max = 2500  # Tiempo máximo de simulación en segundos
+        self.ti = 10  # Temperatura interna inicial
+        self.te = 25  # Temperatura externa inicial
+        self.k = 1  # Conductividad térmica de la ceramica en W/m°C 
+        self.qent = (self.voltaje_V ** 2) / self.resistencia_Ohm  # Potencia entregada al sistema por unidad de tiempo
 
     def sin_perdidas(self):
         temperaturas = []
@@ -25,7 +26,7 @@ class CalentadorH2O:
             # Simulación del fenómeno estocástico
             if np.random.random() < 1/300:  # Probabilidad de 1/300 de ocurrencia del fenómeno
                 descenso_grados = np.random.uniform(0, 50)  # Grados de descenso aleatorio (hasta 50 grados)
-                duracion_descenso = np.random.randint(1, self.tiempo_max - tiempo)  # Duración del descenso en segundos
+                duracion_descenso = np.random.randint(1, 11)  # Duración del descenso en ticks de tiempo (hasta 10 ticks)
                 for _ in range(duracion_descenso):
                     self.ti -= descenso_grados / duracion_descenso  # Aplicar el descenso de temperatura
                     if tiempo < self.tiempo_max:
@@ -53,7 +54,7 @@ class CalentadorH2O:
                 # Simulación del fenómeno estocástico
                 if np.random.random() < 1/300:  # Probabilidad de 1/300 de ocurrencia del fenómeno
                     descenso_grados = np.random.uniform(0, 50)  # Grados de descenso aleatorio (hasta 50 grados)
-                    duracion_descenso = np.random.randint(1, self.tiempo_max - tiempo)  # Duración del descenso en segundos
+                    duracion_descenso = np.random.randint(1, 11)  # Duración del descenso en ticks de tiempo (hasta 10 ticks)
                     for _ in range(duracion_descenso):
                         self.ti -= descenso_grados / duracion_descenso  # Aplicar el descenso de temperatura
                         if tiempo < self.tiempo_max:
@@ -69,7 +70,7 @@ class CalentadorH2O:
 
             todas_temperaturas.append(temperaturas)
             todas_tiempos.append(tiempos)
-            self.ti = 25  # Reiniciar la temperatura inicial para el siguiente espesor
+            self.ti = 10  # Reiniciar la temperatura inicial para el siguiente espesor
 
         self.grafico_tiempo_temp(todas_tiempos, todas_temperaturas)
 
@@ -77,19 +78,18 @@ class CalentadorH2O:
         for i, (tiempos, temperaturas) in enumerate(zip(todas_tiempos, todas_temperaturas)):
             plt.plot(tiempos, temperaturas, label=f"Espesor = {self.espesor[i]}")
         
-        plt.xlabel('Tiempo (s)')
+        plt.xlabel('Tiempo (ticks)')
         plt.ylabel('Temperatura (°C)')
-        plt.title('Gráfico de Temperatura vs. Tiempo')
+        plt.title('Gráfico de Temperatura vs. Tiempo (Con Pérdidas)')
         plt.legend()
         plt.show()
 
     def grafico_tiempo_temp_sin_perdidas(self, tiempos, temperaturas):
         plt.plot(tiempos, temperaturas)
-        plt.xlabel('Tiempo (s)')
+        plt.xlabel('Tiempo (ticks)')
         plt.ylabel('Temperatura (°C)')
         plt.title('Gráfico de Temperatura vs. Tiempo (Sin Pérdidas)')
         plt.show()
-
 
 if __name__ == "__main__":
     g = CalentadorH2O()
