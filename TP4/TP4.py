@@ -14,7 +14,7 @@ class CalentadorH2O:
         self.voltaje_V = 110  # Voltaje suministrado en V
         self.resistencia_Ohm = 108  # Resistencia eléctrica en Ohm
         self.qesph2o = 4186  # Capacidad térmica del agua en J/kg°C
-        self.k = 1  # Conductividad térmica del material en W/m.K
+        self.k = 1  # Conductividad térmica de la ceramica en W/m.K
         self.area = 2 * np.pi * self.radio * self.altura + 2 * np.pi * self.radio**2  # Área total del cilindro
 
     def calcular_potencia(self):

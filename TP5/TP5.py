@@ -6,15 +6,16 @@ class CalentadorH2O:
         self.parametros()
 
     def parametros(self):
-        self.radio = 0.05  # Define el radio del calentador en metros.
-        self.altura = 0.14  # Define la altura del calentador en metros.
+        self.radio = 0.05  # Radio del calentador en metros.
+        self.altura = 0.14  # Altura del calentador en metros.
         self.espesor = [0.01, 0.005, 0.05]  # Define los espesores de las paredes del calentador en metros.
-        self.qent = 108  # Define la cantidad de energía entregada al sistema por unidad de tiempo en vatios.
-        self.qesph2o = 4.186  # Define la cantidad de calor específico del agua en vatios por gramo por grado Celsius.
-        self.tiempo_max = 8  # Define el tiempo máximo de simulación en segundos.
+        self.voltaje_V = 110  # Voltaje suministrado en V
+        self.resistencia_Ohm = 108  # Resistencia eléctrica en Ohm
+        self.qesph2o = 4186  # Capacidad térmica del agua en J/kg°C
+        self.tiempo_max = 2500  # Tiempo máximo de simulación en segundos
         self.ti = 10  # Temperatura inicial.
-        self.te = 10  # Temperatura externa.
-        self.k = 0.02  # Define la conductividad térmica del material en vatios por metro por grado Celsius.
+        self.te = 25  # Temperatura externa.
+        self.k = 1  # Conductividad térmica de la ceramica en W/m°C 
 
     def resistencia_uniforme(self):
         return np.random.uniform(1, 10, 5)
@@ -35,39 +36,25 @@ class CalentadorH2O:
         a, b, c = parametros
         return a * np.exp(b * x) + c  
 
+    def calcular_potencia(self):
+        # Cálculo de la potencia entregada al sistema por unidad de tiempo
+        q_total = (self.voltaje_V**2) / self.resistencia_Ohm
+        return q_total
+
     def sin_perdidas(self):
         temperaturas = []
         tiempos = []
 
+        temperatura_inicial = self.temperatura_inicial_C  # Restablecer la temperatura inicial
+
         for tiempo in range(self.tiempo_max):
-            tf = self.ti + (self.qent / self.qesph2o)
+            tf = temperatura_inicial + (self.calcular_potencia() / self.qesph2o)
             temperaturas.append(tf)
             tiempos.append(tiempo)
-            self.ti = tf
+            temperatura_inicial = tf
 
         self.grafico_tiempo_temp_sin_perdidas(tiempos, temperaturas)
-
-    def con_perdidas(self):
-        area = 2 * 3.1416 * self.altura * self.radio + 2 * 3.1416 * self.radio**2
-        temperaturas1, tiempos1, temperaturas2, tiempos2 = [], [], [], []
-
-        for i in range(3):
-            temperaturas, tiempos = [], []
-            print("Espesor:", self.espesor[i])
-            for tiempo in range(self.tiempo_max):
-                perdida_calor = (self.k * area * (self.ti - self.te)) / self.espesor[i]
-                temperaturas.append(self.ti)
-                tiempos.append(tiempo)
-                self.ti += (self.qent - perdida_calor) / self.qesph2o
-
-            self.ti = 25
-            if i == 0:
-                temperaturas1, tiempos1 = temperaturas, tiempos
-            elif i == 1:
-                temperaturas2, tiempos2 = temperaturas, tiempos
-
-        self.grafico_tiempo_temp(tiempos, temperaturas, tiempos2, temperaturas2, tiempos1, temperaturas1)
-
+    
     def grafico_tiempo_temp(self, tiempos1, temperaturas1):
         plt.plot(tiempos1, temperaturas1, label="Espesor = 0.01")
         plt.xlabel('Tiempo (s)')
@@ -136,14 +123,11 @@ if __name__ == "__main__":
     g = CalentadorH2O()
     stop = False
     while not stop:
-        election = int(input("Ingresar 1 para cálculo sin pérdidas \nIngresar 2 para cálculo con pérdidas\nIngresar 3 para generar y graficar curvas de familia\n"))
+        election = int(input("Ingresar 1 para cálculo sin pérdidas \nIngresar 2 para generar y graficar curvas de familia\n"))
         if election == 1:
             g.sin_perdidas()
             stop = True
         elif election == 2:
-            g.con_perdidas()
-            stop = True
-        elif election == 3:
             g.generar_y_graficar_curvas()
             stop = True
 
