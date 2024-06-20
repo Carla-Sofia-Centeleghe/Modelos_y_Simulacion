@@ -22,8 +22,8 @@ BLUE = (0, 0, 255)
 font = pygame.font.SysFont(None, 24)
 
 # Parámetros de simulación
-media = 10  # Media de la distribución normal (10 AM)
-desviacion_estandar = 2  # Desviación estándar de la distribución normal (2 horas)
+media = 10  # Media de la distribución normal (10 min)
+desviacion_estandar = 5  # Desviación estándar de la distribución normal (5 min)
 clientes_por_manana = 100  # Expectativa matemática de clientes durante la mañana
 horas_apertura = 4  # De 8 a 12 horas, son 4 horas
 segundos_apertura = horas_apertura * 3600
@@ -66,7 +66,7 @@ def atender_clientes(tiempo_actual):
     for i in range(len(boxes)):
         if boxes[i] is None and clientes_en_cola:
             cliente = clientes_en_cola.pop(0)
-            tiempo_atencion = max(1, np.random.normal(600, 7200))  # Normal(10min=600s, std=2h=7200s)
+            tiempo_atencion = max(1, np.random.normal(600, 300))  # Normal(10min=600s, std=5min=300s)
             cliente.tiempo_atendido = tiempo_atencion
             clientes_atendidos.append(cliente)
             tiempos_atencion.append(tiempo_atencion)
@@ -121,9 +121,14 @@ def ejecutar_simulacion():
                 if tiempo_actual >= tiempo_fin_atencion:
                     boxes[i] = None
 
-        # Abandono de clientes después de 30 minutos
-        clientes_en_cola = [cliente for cliente in clientes_en_cola if tiempo_actual - cliente.tiempo_llegada < 1800]
-        clientes_abandonados = [cliente for cliente in clientes_en_cola if tiempo_actual - cliente.tiempo_llegada >= 1800]
+        # Manejo de clientes que abandonan después de 30 minutos
+        nuevos_clientes_en_cola = []
+        for cliente in clientes_en_cola:
+            if tiempo_actual - cliente.tiempo_llegada >= 1800:
+                clientes_abandonados.append(cliente)
+            else:
+                nuevos_clientes_en_cola.append(cliente)
+        clientes_en_cola = nuevos_clientes_en_cola
 
         # Actualizar tiempo
         tiempo_actual += incremento_tiempo

@@ -121,9 +121,14 @@ def ejecutar_simulacion():
                 if tiempo_actual >= tiempo_fin_atencion:
                     boxes[i] = None
 
-        # Abandono de clientes después de 30 minutos
-        clientes_en_cola = [cliente for cliente in clientes_en_cola if tiempo_actual - cliente.tiempo_llegada < 1800]
-        clientes_abandonados = [cliente for cliente in clientes_en_cola if tiempo_actual - cliente.tiempo_llegada >= 1800]
+        # Manejo de clientes que abandonan después de 30 minutos
+        nuevos_clientes_en_cola = []
+        for cliente in clientes_en_cola:
+            if tiempo_actual - cliente.tiempo_llegada >= 1800:
+                clientes_abandonados.append(cliente)
+            else:
+                nuevos_clientes_en_cola.append(cliente)
+        clientes_en_cola = nuevos_clientes_en_cola
 
         # Actualizar tiempo
         tiempo_actual += incremento_tiempo
